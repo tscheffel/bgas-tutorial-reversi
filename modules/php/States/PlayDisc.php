@@ -19,6 +19,12 @@ class PlayDisc extends \Bga\GameFramework\States\GameState
         );
     }
 
+    function getArgs(int $activePlayerId): array {
+        return [
+            'possibleMoves' => $this->game->getPossibleMoves($activePlayerId)
+        ];
+    }
+
     function zombie(int $playerId) {
     }
 }

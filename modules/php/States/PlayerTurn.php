@@ -1,4 +1,4 @@
-<?php
+<!-- <?php
 
 declare(strict_types=1);
 
@@ -114,4 +114,4 @@ class PlayerTurn extends GameState
         $zombieChoice = $this->getRandomZombieChoice($args['playableCardsIds']); // random choice over possible moves
         return $this->actPlayCard($zombieChoice, $playerId, $args); // this function will return the transition to the next state
     }
-}
+} -->

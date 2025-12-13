@@ -156,7 +156,7 @@ class Game extends \Bga\GameFramework\Table
      * This method is called only once, when a new game is launched. In this method, you must setup the game
      *  according to the game rules, so that the game is ready to be played.
      */
-    protected function setupNewGame($players, $options = [])
+    protected function setupNewGame($players, $options = []) : string   
     {
         $this->playerEnergy->initDb(array_keys($players), initialValue: 2);
 

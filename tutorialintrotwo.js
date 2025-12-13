@@ -131,22 +131,30 @@ function (dojo, declare, gamegui, counter, BgaAnimations) {  // note that the in
         {
             console.log( 'Entering state: '+stateName, args );
             
+        //     switch( stateName )
+        //     {
+            
+        //     /* Example:
+            
+        //     case 'myGameState':
+            
+        //         // Show some HTML block at this game state
+        //         dojo.style( 'my_html_block_id', 'display', 'block' );
+                
+        //         break;
+        //    */
+           
+           
+        //     case 'dummy':
+        //         break;
+        //     }
+
+            // ORIGINAL above, tutorial below
             switch( stateName )
             {
-            
-            /* Example:
-            
-            case 'myGameState':
-            
-                // Show some HTML block at this game state
-                dojo.style( 'my_html_block_id', 'display', 'block' );
-                
-                break;
-           */
-           
-           
-            case 'dummy':
-                break;
+                case 'PlayDisc':
+                    this.updatePossibleMoves( args.args.possibleMoves );
+                    break;
             }
         },
 
@@ -182,7 +190,19 @@ function (dojo, declare, gamegui, counter, BgaAnimations) {  // note that the in
         onUpdateActionButtons: function( stateName, args )
         {
             console.log( 'onUpdateActionButtons: '+stateName, args );
-                      
+
+            // if( this.isCurrentPlayerActive() ) {            
+            //     switch( stateName ) {
+            //         case 'PlayDisc':
+            //             // Create confirmation button
+            //             if (this.getGameUserPreference(this.preference_confirm) != 1) {
+            //                 this.statusBar.addActionButton(_('Confirm selection'), () => this.onBtnPlayDisc());
+            //             }
+            //             break;
+            //     }
+            // }
+
+            // ORIGINAL below, tutorial above
             if( this.isCurrentPlayerActive() )
             {            
                 switch( stateName )
@@ -200,6 +220,24 @@ function (dojo, declare, gamegui, counter, BgaAnimations) {  // note that the in
                 }
             }
         },        
+
+        // from tutorial
+        updatePossibleMoves: function( possibleMoves )
+        {
+            // Remove current possible moves
+            document.querySelectorAll('.possibleMove').forEach(div => div.classList.remove('possibleMove'));
+
+            for( var x in possibleMoves )
+            {
+                for( var y in possibleMoves[ x ] )
+                {
+                    // x,y is a possible move
+                    document.getElementById(`square_${x}_${y}`).classList.add('possibleMove');
+                }            
+            }
+                        
+            this.addTooltipToClass( 'possibleMove', '', _('Place a disc here') );  // add tooltip to all possible moves
+        },
 
         ///////////////////////////////////////////////////
         //// Utility methods
