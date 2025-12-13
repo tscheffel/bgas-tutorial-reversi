@@ -117,6 +117,9 @@ function (dojo, declare, gamegui, counter, BgaAnimations) {  // note that the in
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
 
+            // capture board clicks
+            document.querySelectorAll('.square').forEach(square => square.addEventListener('click', e => this.onPlayDisc(e)));
+
             console.log( "Ending game setup" );
         },
        
@@ -183,6 +186,29 @@ function (dojo, declare, gamegui, counter, BgaAnimations) {  // note that the in
                 break;
             }               
         }, 
+
+        onPlayDisc: function( evt )
+        {
+            // Stop this event propagation
+            evt.preventDefault();
+            evt.stopPropagation();
+
+            // Get the cliqued square x and y
+            // Note: square id format is "square_X_Y"
+            var coords = evt.currentTarget.id.split('_');
+            var x = coords[1];
+            var y = coords[2];
+
+            if(!document.getElementById(`square_${x}_${y}`).classList.contains('possibleMove')) {
+                // This is not a possible move => the click does nothing
+                return ;
+            }
+
+            this.bgaPerformAction("actPlayDisc", {
+                x:x,
+                y:y
+            });
+        },
 
         // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
         //                        action status bar (ie: the HTML links in the status bar).
@@ -312,7 +338,7 @@ function (dojo, declare, gamegui, counter, BgaAnimations) {  // note that the in
         */
         setupNotifications: function()
         {
-            console.log( 'notifications subscriptions setup' );
+            console.log( 'notifications subscriptions set up' );
             
             // automatically listen to the notifications, based on the `notif_xxx` function on this class.
             this.bgaSetupPromiseNotifications();
@@ -334,5 +360,55 @@ function (dojo, declare, gamegui, counter, BgaAnimations) {  // note that the in
         },    
         
         */
+
+        notif_playDisc: async function( args )
+        {
+            // Remove current possible moves (makes the board more clear)
+            document.querySelectorAll('.possibleMove').forEach(div => div.classList.remove('possibleMove'));
+        
+            await this.addDiscOnBoard( args.x, args.y, args.player_id );
+        },
+
+        animateTurnOverDisc: async function(disc, targetColor) {
+            const squareDiv = document.getElementById(`square_${disc.x}_${disc.y}`);
+            const discDiv = document.getElementById(`disc_${disc.x}_${disc.y}`);
+            
+            squareDiv.classList.add('flip-animation');
+            await this.wait(500); // for the flip animation to finish
+
+
+            discDiv.dataset.color = targetColor;
+
+            const parallelAnimations = [{
+                keyframes: [ // flip the disc
+                    { transform: `rotateY(180deg)` },
+                    { transform: `rotateY(0deg)` },
+                ]
+            }, {
+                keyframes: [ // lift the disc
+                    { transform: `translate(0, -12px) scale(1.2)`, offset: 0.5 },
+                ]
+            }];
+
+            await this.animationManager.slideAndAttach(discDiv, squareDiv, { duration: 1000, parallelAnimations });
+            
+            squareDiv.classList.remove('flip-animation');
+            await this.wait(500); // for the flip animation removal to finish
+        },
+        
+        notif_turnOverDiscs: async function( args )
+        {
+
+            // Get the color of the player who is returning the discs
+            const targetColor = this.gamedatas.players[ args.player_id ].color;
+
+            // wait for the animations of all turned discs to be over before considering the notif done
+            await Promise.all(
+                args.turnedOver.map(disc => 
+                    this.animateTurnOverDisc(disc, targetColor)
+                )
+            );
+
+        }
    });             
 });

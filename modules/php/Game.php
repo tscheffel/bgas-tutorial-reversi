@@ -18,7 +18,7 @@ declare(strict_types=1);
 
 namespace Bga\Games\tutorialintrotwo;
 
-use Bga\Games\tutorialintrotwo\States\PlayerTurn;
+use Bga\Games\tutorialintrotwo\States\PlayDisc;
 use Bga\GameFramework\Components\Counters\PlayerCounter;
 
 require_once("constants.inc.php");
@@ -26,8 +26,6 @@ require_once("constants.inc.php");
 class Game extends \Bga\GameFramework\Table
 {
     public static array $CARD_TYPES;
-
-    const ST_NEXT_PLAYER = 20;  // or whatever ID you want
 
     public PlayerCounter $playerEnergy;
 
@@ -227,47 +225,12 @@ class Game extends \Bga\GameFramework\Table
         // Activate first player once everything has been initialized and ready.
         $this->activeNextPlayer();
 
-        return PlayerTurn::class;
+        return PlayDisc::class;
     }
-
-    /**
-     * Example of debug function.
-     * Here, jump to a state you want to test (by default, jump to next player state)
-     * You can trigger it on Studio using the Debug button on the right of the top bar.
-     */
-    public function debug_goToState(int $state = 3) {
-        $this->gamestate->jumpToState($state);
-    }
-
-    /**
-     * Another example of debug function, to easily test the zombie code.
-     */
-    public function debug_playAutomatically(int $moves = 50) {
-        $count = 0;
-        while (intval($this->gamestate->getCurrentMainStateId()) < 99 && $count < $moves) {
-            $count++;
-            foreach($this->gamestate->getActivePlayerList() as $playerId) {
-                $playerId = (int)$playerId;
-                $this->gamestate->runStateClassZombie($this->gamestate->getCurrentState($playerId), $playerId);
-            }
-        }
-    }
-
-    /*
-    Another example of debug function, to easily create situations you want to test.
-    Here, put a card you want to test in your hand (assuming you use the Deck component).
-
-    public function debug_setCardInHand(int $cardType, int $playerId) {
-        $card = array_values($this->cards->getCardsOfType($cardType))[0];
-        $this->cards->moveCard($card['id'], 'hand', $playerId);
-    }
-    */
-
 
     /*
     COPIED FROM REVERSI Game.php's Utility section
     */
-
 
     // Get board size - 0 input returns 8 (old table support)
     function getBoardSize(): int {
@@ -385,6 +348,24 @@ class Game extends \Bga\GameFramework\Table
         return $result;
     }
 
+    /**
+     * DEBUG functions
+     * 
+     * Functions starting with "debug_" can be triggered in the Studio with a special menu. Start a new game, click on the Bug icon on the top right then click "playToEndGame". 
+     * You should see the game randomly playing until it reaches the end game, so it helps you check the animations, and you can see if the final scoring is also working as expected.
+     */
+
+    function debug_playAutomatically(int $moves = 50) {
+        $count = 0;
+        while (intval($this->gamestate->getCurrentMainStateId()) < 99 && $count < $moves) {
+            $count++;
+            foreach($this->gamestate->getActivePlayerList() as $playerId) {
+                $playerId = (int)$playerId;
+                $this->gamestate->runStateClassZombie($this->gamestate->getCurrentState($playerId), $playerId);
+            }
+        }
+    }
+
     function debug_playToFiftyPercent() {
         $count = 0;
         while ($this->gamestate->getCurrentMainStateId() < ST_END_GAME && $this->getGameProgression() <= 50 && $count < 100) {
@@ -397,13 +378,17 @@ class Game extends \Bga\GameFramework\Table
     }
 
     function debug_playToEndGame() {
-        $count = 0;
-        while ($this->gamestate->getCurrentMainStateId() < ST_END_GAME && $count < 100) {
-            $count++;
-            foreach($this->gamestate->getActivePlayerList() as $playerId) {
-                $playerId = (int)$playerId;
-                $this->gamestate->runStateClassZombie($this->gamestate->getCurrentState($playerId), $playerId);
-            }
-        }
+        $this->debug_playAutomatically(64); // reversi max moves is under 64 for the standard size board
     }
+
+    // function debug_playToEndGame() {
+    //     $count = 0;
+    //     while ($this->gamestate->getCurrentMainStateId() < ST_END_GAME && $count < 100) {
+    //         $count++;
+    //         foreach($this->gamestate->getActivePlayerList() as $playerId) {
+    //             $playerId = (int)$playerId;
+    //             $this->gamestate->runStateClassZombie($this->gamestate->getCurrentState($playerId), $playerId);
+    //         }
+    //     }
+    // }
 }
