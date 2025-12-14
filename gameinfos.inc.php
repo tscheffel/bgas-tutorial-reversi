@@ -1,17 +1,28 @@
 <?php
 
-/*
- * From this file, you can edit the various meta-information of your game.
+/**
+ * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
+ * tutorialintrotwo implementation : © Troy W Scheffel / Digital Adventure Systems
+ * 
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * 
+ * gameinfos.inc.php
  *
- * Once you modified the file, don't forget to click on "Reload game informations" from the Control Panel in order in can be taken into account.
+ * tutorialintrotwo game metadata
+ * 
+ * After modifying this file, don't forget to click on "Reload game informations" from the Control Panel in BGA Studio to see your changes.
  *
  * See documentation about this file here:
  * http://en.doc.boardgamearena.com/Game_meta-information:_gameinfos.inc.php
-*/
-
+ *
+ */
+ 
 $gameinfos = [
+    'developed_by_bga_extension' => 'Digital Adventure Systems',
+
     // Name of the game in English (will serve as the basis for translation)
-    'game_name' => "das_tutorial_reversi",
+    'game_name' => "Reversi",
 
     // Game publisher (use empty string if there is no publisher)
     'publisher' => 'Digital Adventure Systems',
